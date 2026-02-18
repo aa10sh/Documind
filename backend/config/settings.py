@@ -2,8 +2,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env
-load_dotenv 
+# Explicitly load .env from project root
+ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
+
+print("ENV PATH:", ENV_PATH)
+
 
 # PROJECT ROOT PATH
 BASE_DIR= Path(__file__).resolve().parent.parent.parent
@@ -31,7 +35,7 @@ OPENAI_CHAT_MODEL = "gpt-4o-mini"
 OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"
 
 # HuggingFace Models
-HF_CHAT_MODEL = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+HF_CHAT_MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"
 HF_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # RAG CONFIGURATION
@@ -46,3 +50,5 @@ VECTOR_DB_TYPE = "faiss"   # faiss / chroma
 APP_NAME = "DocuMind AI"
 APP_VERSION = "1.0.0"
 DEBUG = True
+
+print("LLM_PROVIDER =", LLM_PROVIDER)

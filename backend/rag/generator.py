@@ -1,6 +1,5 @@
 from langchain_openai import ChatOpenAI
-from langchain_huggingface import HuggingFaceEndpoint
-from langchain.prompts import PromptTemplate
+from huggingface_hub import InferenceClient
 
 from backend.config.settings import (
     LLM_PROVIDER,
@@ -15,8 +14,17 @@ from backend.rag.prompt_templates import (
 )
 from backend.config.logging import logger
 
+
+# ---------------------------------------------------
 # Load LLM based on provider
+# ---------------------------------------------------
 def get_llm():
+    """
+    Returns LLM client based on provider.
+    OpenAI -> LangChain ChatOpenAI
+    HuggingFace -> Official Router InferenceClient
+    """
+
     if LLM_PROVIDER.lower() == "openai":
         logger.info("Using OpenAI LLM")
 
@@ -29,63 +37,73 @@ def get_llm():
     elif LLM_PROVIDER.lower() == "huggingface":
         logger.info("Using HuggingFace LLM")
 
-        return HuggingFaceEndpoint(
-            repo_id=HF_CHAT_MODEL,
-            huggingfacehub_api_token=HF_API_KEY,
-            temperature=0.3,
-            max_new_tokens=512
+        return InferenceClient(
+            model=HF_CHAT_MODEL,
+            token=HF_API_KEY
         )
 
     else:
         raise ValueError("Invalid LLM_PROVIDER")
 
 
-
-# Generate Answer from Retrieved Chunks
+# ---------------------------------------------------
+# Generate Answer using RAG
+# ---------------------------------------------------
 def generate_answer(question: str, chunks: list[str]) -> str:
     """
-    Generates answer using RAG pipeline.
+    RAG Pipeline:
+    Question + Retrieved Chunks -> LLM -> Answer
     """
-
-    llm = get_llm()
-
-    context = "\n\n".join(chunks)
-
-    prompt = PromptTemplate(
-        template=RAG_PROMPT_TEMPLATE,
-        input_variables=["context", "question"]
-    )
-
-    chain = prompt | llm
 
     logger.info("Generating answer using LLM...")
 
-    response = chain.invoke({
-        "context": context,
-        "question": question
-    })
+    context = "\n\n".join(chunks)
 
-    return response.content
-
-
-
-# Generate Document Summary
-def generate_summary(text: str) -> str:
-    """
-    Generates full document summary.
-    """
+    prompt = RAG_PROMPT_TEMPLATE.format(
+        context=context,
+        question=question
+    )
 
     llm = get_llm()
 
-    prompt = PromptTemplate(
-        template=SUMMARY_PROMPT_TEMPLATE,
-        input_variables=["text"]
-    )
+    # -------- OpenAI Path --------
+    if LLM_PROVIDER.lower() == "openai":
+        response = llm.invoke(prompt)
+        return response.content
 
-    chain = prompt | llm
+    # -------- HuggingFace Path --------
+    elif LLM_PROVIDER.lower() == "huggingface":
+        response = llm.text_generation(
+            prompt,
+            max_new_tokens=512,
+            temperature=0.3
+        )
+        return response
+
+
+# ---------------------------------------------------
+# Generate Document Summary
+# ---------------------------------------------------
+def generate_summary(text: str) -> str:
+    """
+    Full document summarization.
+    """
 
     logger.info("Generating document summary...")
 
-    response = chain.invoke({"text": text})
+    prompt = SUMMARY_PROMPT_TEMPLATE.format(text=text)
+    llm = get_llm()
 
-    return response.content
+    # -------- OpenAI Path --------
+    if LLM_PROVIDER.lower() == "openai":
+        response = llm.invoke(prompt)
+        return response.content
+
+    # -------- HuggingFace Path --------
+    elif LLM_PROVIDER.lower() == "huggingface":
+        response = llm.text_generation(
+            prompt,
+            max_new_tokens=512,
+            temperature=0.3
+        )
+        return response
