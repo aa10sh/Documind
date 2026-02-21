@@ -28,16 +28,16 @@ Built with a scalable **FastAPI + Docker + Nginx microservice architecture**, de
 ## 📸 Project Screenshots
 
 ### 🏠 Application Interface
-![Home]([screenshots/home.png](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145823.png))
+![Home](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145823.png)
 
 ### 📄 Document Upload
-![Upload]([screenshots/upload.png](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145845.png))
+![Upload](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145845.png)
 
 ### 🧠 AI Generated Summary
-![Summary]([screenshots/summary.png](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145953.png))
+![Summary](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20145953.png)
 
 ### 💬 Chat with Document
-![Chat]([screenshots/chat.png](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20150251.png))
+![Chat](https://github.com/aa10sh/Documind/blob/main/Screenshot%202026-02-21%20150251.png)
 
 ---
 
